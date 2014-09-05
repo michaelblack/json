@@ -42,7 +42,7 @@ instance Show Number where
   show (Float   n) = show n
 
 
-showObject :: [(Key, Value)] -> String
+showObject :: [(Text, Value)] -> String
 showObject vals = concat ["{", (intercalate "," . map pairify) vals, "}"]
   where pairify (k, v) = concat [show (unpack k), ":", show v]
 
