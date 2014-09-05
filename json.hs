@@ -58,8 +58,7 @@ stringValue = String <$> stringParse
 
 stringParse :: Parser Text
 stringParse = between (char '"') (char '"') (T.concat <$> (many1 $ (textify <$> noneOf "\"\\") <|> escape))
-  where escape :: Parser Text
-        escape   = do char '\\'
+  where escape   = do char '\\'
                       code <- oneOf "\"\\/burnft"
                       rest <- if code == 'u' then hexCode else return ""
                       return $ cons '\\' (cons code rest)
@@ -94,7 +93,9 @@ booleanValue = Boolean <$> do b <- choice [string "true", string "false"]
 objectValue :: Parser Value
 objectValue = Object  <$>
               between (char '{') (char '}')
-              ((liftA2 (,) ((spaces *> stringParse <* spaces) <* char ':') (spaces *> value <* spaces)) `sepBy` (char ','))
+              ((liftA2 (,) ((spaces *> stringParse <* spaces) <* char ':')
+                           ( spaces *> value <* spaces))
+               `sepBy` (char ','))
 
 arrayValue :: Parser Value
 arrayValue = Array <$>
