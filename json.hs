@@ -67,22 +67,22 @@ stringParse = between (char '"') (char '"') (T.concat <$> (many1 $ (textify <$> 
         textify = flip cons ""
 
 numberValue :: Parser Value
-numberValue = Number <$> do minus  <- maybe False (const True) <$> optionMaybe (char '-')
-                            first  <- many1 digit
-                            second <- optionMaybe (char '.' *> many1 digit)
-                            exp    <- optionMaybe (oneOf "eE" *> liftA2 (,) (optionMaybe $ oneOf "-+") (many1 digit))
-                            if isNothing second && isNothing exp
-                              then return $ makeInteger minus first
-                              else return $ makeFloat   minus first second exp
+numberValue = Number <$> do minus       <- isJust <$> optionMaybe (char '-')
+                            predecimal  <- many1 digit
+                            postdecimal <- optionMaybe (char '.' *> many1 digit)
+                            exp         <- optionMaybe (oneOf "eE" *> liftA2 (,) (optionMaybe $ oneOf "-+") (many1 digit))
+                            if isNothing postdecimal && isNothing exp
+                              then return $ makeInteger minus predecimal
+                              else return $ makeFloat   minus predecimal postdecimal exp
   where makeInteger minus first            = Integer ((if minus then negate else id) (read first))
         makeFloat   minus first second exp = Float   ((if minus then negate else id)
                                                       (((read first) +
                                                        (maybe 0 decimalize  second)) *
                                                        (maybe 1 exponentize exp   )))
         decimalize  str         = (read str) * (recip  $ 10**(fromIntegral $ length str))
-        exponentize (sign, str) = 10 ** ((maybe id sign2func sign) (read str))
-        sign2func '+'           = id
-        sign2func '-'           = negate
+        exponentize (sign, str) = 10 ** ((maybe id plusOrMinus sign) (read str))
+        plusOrMinus '+'         = id
+        plusOrMinus '-'         = negate
 
 
 booleanValue :: Parser Value
