@@ -6,7 +6,6 @@ import           Data.Maybe
 import           Data.Text           hiding (concat, count, intercalate, length,
                                       map)
 import qualified Data.Text           as T
-import           Prelude             hiding (null)
 import           Text.Parsec
 import           Text.Parsec.Text
 
