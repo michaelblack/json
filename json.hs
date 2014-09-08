@@ -114,4 +114,4 @@ value = choice [objectValue, arrayValue, stringValue, numberValue, booleanValue,
 -- parse json "Whoops." (pack "[null, true, false]")
 -- @
 json :: Parser Value
-json = spaces *> value <* spaces
+json = spaces *> (objectValue <|> arrayValue) <* spaces
